@@ -1,4 +1,6 @@
-# Golang + Dapr
+# From Zero to Hero with Go and Dapr
+
+[Slides](slides.pdf)
 
 This is a Go application demonstrating the key features of [Dapr](https://dapr.io) with a few different approaches. My goal is to help you pick the best fit for your needs and level up as a microservices developer.
 
@@ -41,7 +43,9 @@ Finally, general products are stored in the Products gRPC service. The developer
 
 ## Running the demo
 
-**Start the Product service**
+After running `dapr init`, you should have Redis running in a Docker container. You will need to create a PostgreSQL database and update `secrets.json` accordingly. Then create the `widgets` table from `tables.sql`.
+
+**Start the Products service**
 
 ```shell
 make run-products
@@ -49,7 +53,7 @@ make run-products
 
 **Start the main Inventory service**
 
-_Pick the client mode_
+In a second terminal run: (_Pick the client mode_)
 
 ```shell
 make run-custom-http
@@ -58,11 +62,15 @@ make run-sdk-http
 make run-sdk-grpc
 ```
 
+In a third terminal you can publish the 3 product event types.
+
 **Send a Widget**
 
 ```shell
 make send-widget
 ```
+
+This will save in the PostgreSQL database.
 
 **Send a Gadget**
 
@@ -70,11 +78,15 @@ make send-widget
 make send-gadget
 ```
 
+This will save in the Redis state store.
+
 **Send a Thingamajig**
 
 ```shell
 make send-thingamajig
 ```
+
+This will invoke the Products service using Dapr for service discovery and mTLS authentication.
 
 That's it!
 
