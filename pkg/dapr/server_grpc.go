@@ -93,11 +93,6 @@ func (s *Server) RegisterTopicEventHandlers(registrars ...HandlerRegistrar) {
 }
 
 func (s *Server) OnTopicEvent(ctx context.Context, in *pb.TopicEventRequest) (*pb.TopicEventResponse, error) {
-	// if len(in.Data) == 0 {
-	// 	return &pb.TopicEventResponse{
-	// 		Status: pb.TopicEventResponse_SUCCESS,
-	// 	}, nil
-	// }
 	handler, ok := s.handlers[in.Path]
 	if !ok {
 		s.log.Error(nil, "handler not found", "path", in.Path)

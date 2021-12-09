@@ -117,9 +117,6 @@ func (s *Service) SaveSDK(ctx context.Context, e *common.TopicEvent) (retry bool
 	if err := e.Struct(&widget); err != nil {
 		return false, err
 	}
-	// if err := dapr.DecodeTopicEvent(e, &widget); err != nil {
-	// 	return false, err
-	// }
 	if err := s.store.Save(ctx, &widget); err != nil {
 		return false, err
 	}

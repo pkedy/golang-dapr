@@ -41,9 +41,17 @@ Gadgets are saved simply by calling the "Save state" operation of the [State man
 
 Finally, general products are stored in the Products gRPC service. The developer uses the generated gRPC client as normal; however, the endpoint is the Dapr sidecar and an additional `dapr-app-id` metadata field is attached to the request so Dapr know how to route the request. See this [How-To](https://docs.dapr.io/developing-applications/building-blocks/service-invocation/howto-invoke-services-grpc/) for more details.
 
+All component configurations are located in the `components` directory. The main Dapr configuration is in `config.yaml` and is where tracing and preview features are enabled.
+
 ## Running the demo
 
 After running `dapr init`, you should have Redis running in a Docker container. You will need to create a PostgreSQL database and update `secrets.json` accordingly. Then create the `widgets` table from `tables.sql`.
+
+I launched Postgres in a container and used [pgAdmin](https://www.pgadmin.org) to create the `golang+dapr` database and `widgets` table.
+
+```shell
+docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+```
 
 **Start the Products service**
 
@@ -62,9 +70,11 @@ make run-sdk-http
 make run-sdk-grpc
 ```
 
-In a third terminal you can publish the 3 product event types.
+**Send product events**
 
-**Send a Widget**
+In a third terminal you can publish the 3 product event types. The contents of each message are located in the `messages` directory.
+
+Send a Widget
 
 ```shell
 make send-widget
@@ -72,7 +82,7 @@ make send-widget
 
 This will save in the PostgreSQL database.
 
-**Send a Gadget**
+Send a Gadget
 
 ```shell
 make send-gadget
@@ -80,7 +90,7 @@ make send-gadget
 
 This will save in the Redis state store.
 
-**Send a Thingamajig**
+Send a Thingamajig
 
 ```shell
 make send-thingamajig
