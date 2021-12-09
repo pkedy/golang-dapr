@@ -57,7 +57,13 @@ func (r *Repository) Save(ctx context.Context, product *products.Product) error 
 
 func (r *Repository) Load(ctx context.Context, id string) (*products.Product, error) {
 	r.log.Info("Invoking products service: GetProduct")
-	ctx = metadata.AppendToOutgoingContext(ctx, "dapr-app-id", "products")
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		md = metadata.MD{}
+	}
+	md.Append("dapr-app-id", "products")
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	//AppendToOutgoingContext(ctx, "dapr-app-id", "products")
 	product, err := r.client.GetProduct(ctx, &pb.ProductRequest{Id: id})
 	if err != nil {
 		st, ok := status.FromError(err)

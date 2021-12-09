@@ -16,12 +16,15 @@ run-products:
 	dapr run --app-id products --config ./config.yaml --components-path ./components --app-protocol grpc --app-port 50151 -- go run cmd/products/main.go
 
 send-widget:
+	cat messages/widget.json | jq
 	curl -s http://localhost:3500/v1.0/publish/pubsub/inventory -H Content-Type:application/cloudevents+json --data @messages/widget.json
 
 send-gadget:
+	cat messages/gadget.json | jq
 	curl -s http://localhost:3500/v1.0/publish/pubsub/inventory -H Content-Type:application/cloudevents+json --data @messages/gadget.json
 
 send-thingamajig:
+	cat messages/thingamajig.json | jq
 	curl -s http://localhost:3500/v1.0/publish/pubsub/inventory -H Content-Type:application/cloudevents+json --data @messages/thingamajig.json
 
 get-widget:
