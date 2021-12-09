@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package dapr.examples.golang.products.v1;
+
+option go_package = "github.org/pkedy/golang-dapr/pkg/products";
+
+import "google/protobuf/empty.proto";
+
+service Products {
+  rpc GetProduct (ProductRequest) returns (Product) {}
+  rpc SaveProduct (Product) returns (google.protobuf.Empty) {}
+}
+
+message ProductRequest {
+  string id = 1;
+}
+
+message Product {
+  string id = 1;
+  string description = 2;
+  double price = 3;
+}

@@ -1,0 +1,13 @@
+{
+  "id": "2222",
+  "type": "widget.v1",
+  "source": "golang-dapr",
+  "specversion": "1.0",
+  "datacontenttype": "application/json",
+  "data": {
+    "id": "widget",
+    "description": "Hello, Widget!",
+    "price": 175.00,
+    "widgetField": "widgets only"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "1111",
+  "type": "gadget.v1",
+  "source": "golang-dapr", 
+  "specversion": "1.0",
+  "datacontenttype": "application/json",
+  "data": {
+    "id": "gadget",
+    "description": "Hello, Gadget!",
+    "price": 75.00,
+    "gadgetField": "gadgets only"
+  }
+}

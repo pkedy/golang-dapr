@@ -1,0 +1,12 @@
+{
+  "id": "3333",
+  "type": "thingamajig.v1",
+  "source": "golang-dapr",
+  "specversion": "1.0",
+  "datacontenttype": "application/json",
+  "data": {
+      "id": "thingamajig",
+      "description": "Hello, Thingamajig!",
+      "price": 5.00
+  }
+}
