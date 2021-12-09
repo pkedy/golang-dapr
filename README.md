@@ -74,29 +74,23 @@ make run-sdk-grpc
 
 In a third terminal you can publish the 3 product event types. The contents of each message are located in the `messages` directory.
 
-Send a Widget
+Send a Widget: This will save in the PostgreSQL database.
 
 ```shell
 make send-widget
 ```
 
-This will save in the PostgreSQL database.
-
-Send a Gadget
+Send a Gadget: This will save in the Redis state store.
 
 ```shell
 make send-gadget
 ```
 
-This will save in the Redis state store.
-
-Send a Thingamajig
+Send a Thingamajig: This will invoke the Products service using Dapr for service discovery and mTLS authentication.
 
 ```shell
 make send-thingamajig
 ```
-
-This will invoke the Products service using Dapr for service discovery and mTLS authentication.
 
 That's it!
 
