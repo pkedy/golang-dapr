@@ -46,7 +46,7 @@ func (r *Repository) Close() error {
 
 func (r *Repository) Save(ctx context.Context, product *products.Product) error {
 	r.log.Info("Invoking products service: SaveProduct")
-	ctx = metadata.AppendToOutgoingContext(ctx, "dapr-app-id", "products")
+	ctx = invokingContext(ctx, "products")
 	_, err := r.client.SaveProduct(ctx, &pb.Product{
 		Id:          product.ID,
 		Description: product.Description,
@@ -57,13 +57,7 @@ func (r *Repository) Save(ctx context.Context, product *products.Product) error 
 
 func (r *Repository) Load(ctx context.Context, id string) (*products.Product, error) {
 	r.log.Info("Invoking products service: GetProduct")
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		md = metadata.MD{}
-	}
-	md.Append("dapr-app-id", "products")
-	ctx = metadata.NewOutgoingContext(ctx, md)
-	//AppendToOutgoingContext(ctx, "dapr-app-id", "products")
+	ctx = invokingContext(ctx, "products")
 	product, err := r.client.GetProduct(ctx, &pb.ProductRequest{Id: id})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -77,4 +71,16 @@ func (r *Repository) Load(ctx context.Context, id string) (*products.Product, er
 		Description: product.Description,
 		Price:       product.Price,
 	}, nil
+}
+
+func invokingContext(ctx context.Context, daprAppID string) context.Context {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		md = metadata.MD{}
+	} else {
+		md = md.Copy() // Make a copy for concurrency reasons.
+	}
+	md.Append("dapr-app-id", daprAppID)
+
+	return metadata.NewOutgoingContext(ctx, md)
 }
