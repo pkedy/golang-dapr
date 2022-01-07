@@ -1,10 +1,10 @@
 PHONY: run-custom-http run-custom-grpc run-sdk-http run-sdk-grpc send-widget send-gadget send-thingamajig
 
 run-custom-http:
-	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol http --app-port 3001 --dapr-http-port 3500 -- go run cmd/inventory/main.go
+	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol http --app-port 3001 --dapr-http-port 3500 -- go run cmd/inventory/main.go http
 
 run-custom-grpc:
-	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol grpc --app-port 4001 --dapr-http-port 3500 -- go run cmd/inventory/main.go
+	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol grpc --app-port 4001 --dapr-http-port 3500 -- go run cmd/inventory/main.go grpc
 
 run-sdk-http:
 	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol http --app-port 3002 --dapr-http-port 3500 -- go run cmd/inventory/main.go

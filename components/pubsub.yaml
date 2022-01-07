@@ -3,24 +3,10 @@ kind: Component
 metadata:
   name: pubsub
 spec:
-  #type: pubsub.redis
-  type: pubsub.kafka
+  type: pubsub.redis
   version: v1
   metadata:
-  - name: brokers
-    value: "localhost:9092"
-  - name: clientID
-    value: golangdapr
-  - name: authRequired
-    value: "false"
-  # value: "true"
-  # - name: saslUsername
-  #   value: "D5XXXXXXXXXXN"
-  # - name: saslPassword
-  #   value: "fjwtLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXrRSN"
-  - name: maxMessageBytes
-    value: 2048
-  # - name: redisHost
-  #   value: localhost:6379
-  # - name: redisPassword
-  #   value: ""
+  - name: redisHost
+    value: localhost:6379
+  - name: redisPassword
+    value: ""

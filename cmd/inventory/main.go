@@ -6,7 +6,9 @@ import (
 	"flag"
 	"net"
 	"os"
+	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	pb "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"github.com/dapr/go-sdk/service/common"
 	dapr_server_grpc "github.com/dapr/go-sdk/service/grpc"
@@ -65,16 +67,20 @@ func main() {
 	//   * Custom code for gRPC
 	//   * Using the Go SDK (protocol doesn't matter)
 	//
-
 	var daprClient api
-	switch clientType {
-	case "http":
-		daprClient, err = dapr.NewHTTP(ctx)
-	case "grpc":
-		daprClient, err = dapr.NewGRPC(ctx)
-	default:
-		daprClient, err = dapr.NewSDK(ctx)
-	}
+	err = backoff.RetryNotify(func() (err error) {
+		switch clientType {
+		case "http":
+			daprClient, err = dapr.NewHTTP(ctx)
+		case "grpc":
+			daprClient, err = dapr.NewGRPC(ctx)
+		default:
+			daprClient, err = dapr.NewSDK(ctx)
+		}
+		return err
+	}, backoff.NewExponentialBackOff(), func(err error, _ time.Duration) {
+		log.Info("Retrying Dapr client connection...")
+	})
 	if err != nil {
 		log.Error(err, "could not create connection to Dapr")
 		os.Exit(1)

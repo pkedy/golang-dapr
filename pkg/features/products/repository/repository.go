@@ -8,13 +8,15 @@ import (
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"github.com/pkedy/golang-dapr/pkg/dapr"
 	"github.com/pkedy/golang-dapr/pkg/errorz"
 	"github.com/pkedy/golang-dapr/pkg/features/products"
 	pb "github.com/pkedy/golang-dapr/proto/products"
 )
+
+const daprAppID = "products"
 
 var (
 	GRPCADDRESS = fmt.Sprintf("127.0.0.1:%s", os.Getenv("DAPR_GRPC_PORT"))
@@ -27,7 +29,10 @@ type Repository struct {
 }
 
 func New(log logr.Logger) (*Repository, error) {
-	conn, err := grpc.Dial(GRPCADDRESS, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(GRPCADDRESS,
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect: %v", err)
 	}
@@ -46,7 +51,7 @@ func (r *Repository) Close() error {
 
 func (r *Repository) Save(ctx context.Context, product *products.Product) error {
 	r.log.Info("Invoking products service: SaveProduct")
-	ctx = invokingContext(ctx, "products")
+	ctx = dapr.InvokingContext(ctx, daprAppID)
 	_, err := r.client.SaveProduct(ctx, &pb.Product{
 		Id:          product.ID,
 		Description: product.Description,
@@ -57,7 +62,7 @@ func (r *Repository) Save(ctx context.Context, product *products.Product) error 
 
 func (r *Repository) Load(ctx context.Context, id string) (*products.Product, error) {
 	r.log.Info("Invoking products service: GetProduct")
-	ctx = invokingContext(ctx, "products")
+	ctx = dapr.InvokingContext(ctx, daprAppID)
 	product, err := r.client.GetProduct(ctx, &pb.ProductRequest{Id: id})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -71,16 +76,4 @@ func (r *Repository) Load(ctx context.Context, id string) (*products.Product, er
 		Description: product.Description,
 		Price:       product.Price,
 	}, nil
-}
-
-func invokingContext(ctx context.Context, daprAppID string) context.Context {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		md = metadata.MD{}
-	} else {
-		md = md.Copy() // Make a copy for concurrency reasons.
-	}
-	md.Append("dapr-app-id", daprAppID)
-
-	return metadata.NewOutgoingContext(ctx, md)
 }

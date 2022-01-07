@@ -9,6 +9,8 @@ import (
 	v1 "github.com/dapr/dapr/pkg/proto/common/v1"
 	pb "github.com/dapr/dapr/pkg/proto/runtime/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/pkedy/golang-dapr/pkg/components/secrets"
 	"github.com/pkedy/golang-dapr/pkg/components/state"
@@ -30,8 +32,9 @@ func NewGRPC(ctx context.Context) (*GRPC, error) {
 	conn, err := grpc.DialContext(
 		ctx,
 		GRPCADDRESS,
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
+		grpc.WithUnaryInterceptor(UnaryClientInterceptor),
 	)
 	if err != nil {
 		return nil, err
@@ -114,4 +117,32 @@ func etagGRPC(value string) *v1.Etag {
 	return &v1.Etag{
 		Value: value,
 	}
+}
+
+// UnaryClientInterceptor for passing incoming metadata to outgoing metadata
+func UnaryClientInterceptor(
+	ctx context.Context,
+	method string,
+	req, reply interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption) error {
+	// Take the incoming metadata and transfer it to the outgoing metadata
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		ctx = metadata.NewOutgoingContext(ctx, md)
+	}
+	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
+// InvokingContext returns a new context with the target Dapr App ID added to outgoing metadata.
+func InvokingContext(ctx context.Context, daprAppID string) context.Context {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		md = metadata.MD{}
+	} else {
+		md = md.Copy() // Make a copy for concurrency reasons.
+	}
+	md.Append("dapr-app-id", daprAppID)
+
+	return metadata.NewOutgoingContext(ctx, md)
 }
