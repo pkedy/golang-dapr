@@ -1,4 +1,9 @@
-PHONY: run-custom-http run-custom-grpc run-sdk-http run-sdk-grpc send-widget send-gadget send-thingamajig
+PHONY: run-custom-http run-custom-grpc run-sdk-http run-sdk-grpc
+PHONY: send-widget send-gadget send-thingamajig send-all
+PHONY: get-widget get-gadget get-thingamajig get-all
+
+run-test:
+	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol http --app-port 3001 --dapr-http-port 3500 -- sleep 6000
 
 run-custom-http:
 	dapr run --app-id inventory --config ./config.yaml --components-path ./components --app-protocol http --app-port 3001 --dapr-http-port 3500 -- go run cmd/inventory/main.go http
@@ -27,11 +32,15 @@ send-thingamajig:
 	cat messages/thingamajig.json | jq
 	curl -s http://localhost:3500/v1.0/publish/pubsub/inventory -H Content-Type:application/cloudevents+json --data @messages/thingamajig.json
 
+send-all: send-widget send-gadget send-thingamajig
+
 get-widget:
 	curl -s http://localhost:3000/v1/widgets/widget | jq
 
 get-gadget:
 	curl -s http://localhost:3000/v1/gadgets/gadget | jq
 
-get-product:
+get-thingamajig:
 	curl -s http://localhost:3000/v1/products/thingamajig | jq
+
+get-all: get-widget get-gadget get-thingamajig
