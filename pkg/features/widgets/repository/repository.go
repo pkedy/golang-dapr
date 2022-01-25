@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-logr/logr"
 	"github.com/jackc/pgx/v4"
@@ -59,7 +60,10 @@ func (r *Repository) Load(ctx context.Context, id string) (*widgets.Widget, erro
 	var description string
 	var price float64
 	if err := row.Scan(&description, &price); err != nil {
-		r.log.Error(err, "error loading widget", "id", id)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errorz.NotFound("widget with id %q was not found", id)
+		}
+		r.log.Info("error loading widget", "id", id)
 		return nil, errorz.Internal(err, "could not load widget %q", id)
 	}
 	return &widgets.Widget{

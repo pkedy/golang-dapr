@@ -11,7 +11,7 @@ spec:
   routes:
     rules:
       - match: "event.type == 'widget.v1'"
-        path: /widgets
+        path: /widgets.v1
       - match: "event.type == 'gadget.v1'"
-        path: /gadgets
-    default: /products
+        path: /gadgets.v1
+    default: /products.v1
